@@ -18,11 +18,19 @@ life_expectancy_train<-Life_Expectancy_Data_Updated %>%
   summarize(across(2:19, mean))
 
 #check to make sure dataframe is formatted correctly
-View(life_expectancy_avg)
-summary(life_expectancy_avg)
-str(life_expectancy_avg)
+#View(life_expectancy_train)
+dim(life_expectancy_train)
+summary(life_expectancy_train)
+str(life_expectancy_train)
 
 #All checks out so we can use 'life_expectancy_train' as our training set
 
 life_expectancy_test<-Life_Expectancy_Data_Updated %>%
-  filter(Year==2015)
+  filter(Year==2015) %>%
+  select(-Year)
+
+#View(life_expectancy_test)
+summary(life_expectancy_test)
+dim(life_expectancy_test)
+str(life_expectancy_test)
+
