@@ -13,3 +13,7 @@ See how different factors affect life expectency across the world; predict life 
     
     - predict life expectency for years in the future 
         - Assuming technology development and factors like disease hold constant
+
+## Miscellaneous ##
+
+always use seed '23'
