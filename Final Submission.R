@@ -42,3 +42,17 @@ str(life_expectancy_test)
 
 #All is good so we can use 'life_expectancy_test' as our test set
 
+
+#Create new variable above_below_GDP, which indicates if a countries GDP is above or below the average GDP in the data set
+
+mean_GDP=mean(life_expectancy_train$GDP_per_capita)
+
+above_or_below_GDP=ifelse(life_expectancy_train$GDP_per_capita>=mean_GDP,1,0)
+
+life_expectancy_train['above_or_below_GDP']<-above_or_below_GDP
+
+mean_GDP=mean(life_expectancy_test$GDP_per_capita)
+
+above_or_below_GDP=ifelse(life_expectancy_test$GDP_per_capita>=mean_GDP,1,0)
+
+life_expectancy_test['above_or_below_GDP']<-above_or_below_GDP
