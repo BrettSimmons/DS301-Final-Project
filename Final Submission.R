@@ -1,11 +1,13 @@
 ## import raw data csv as data frame 
+#install.packages("readr")
 library(readr)
 Life_Expectancy_Data_Updated <- read_csv("Life-Expectancy-Data-Updated.csv")
 
-# look at summary of dataset
+# look at summary of data set
 summary(Life_Expectancy_Data_Updated)
 View(Life_Expectancy_Data_Updated)
 
+#install.packages("tidyverse")
 library(tidyverse)
 
 # there are 179 unique countries in our data set
