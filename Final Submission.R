@@ -1,9 +1,9 @@
 ## import raw data csv as data frame 
-#install.packages("readr")
+install.packages("readr")
 library(readr)
 Life_Expectancy_Data_Updated <- read_csv("Life-Expectancy-Data-Updated.csv")
 
-# look at summary of data set
+#look at summary of data set
 summary(Life_Expectancy_Data_Updated)
 View(Life_Expectancy_Data_Updated)
 
@@ -17,7 +17,9 @@ length(unique(Life_Expectancy_Data_Updated$Country))
 life_expectancy_train<-Life_Expectancy_Data_Updated %>%
   filter(Year!=2015) %>%
   group_by(Country, Region) %>%
-  summarize(across(2:19, mean))
+  summarize(across(2:19, mean)) %>%
+  select(-Economy_status_Developing)
+
 
 #check to make sure data frame is formatted correctly
 #View(life_expectancy_train)
@@ -30,7 +32,7 @@ str(life_expectancy_train)
 #create test set using data from year 2015
 life_expectancy_test<-Life_Expectancy_Data_Updated %>%
   filter(Year==2015) %>%
-  select(-Year)
+  select(-c(Year,Economy_status_Developing))
 
 #check to make sure data fram is formatted correctly
 #View(life_expectancy_test)
