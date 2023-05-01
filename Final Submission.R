@@ -1,4 +1,6 @@
-## import raw data csv as data frame 
+## Data cleaning and preparation ##
+
+# import raw data csv as data frame 
 install.packages("readr")
 library(readr)
 Life_Expectancy_Data_Updated <- read_csv("Life-Expectancy-Data-Updated.csv")
