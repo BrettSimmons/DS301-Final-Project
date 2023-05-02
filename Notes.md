@@ -17,3 +17,13 @@ See how different factors affect life expectency across the world; predict life 
 ## Miscellaneous ##
 
 always use seed '23'
+
+## Presentation ##
+
+Amanda: 
+
+Abbie: 
+
+Brett:
+
+Madeline: 
