@@ -22,6 +22,7 @@ train<-Life_Expectancy_Data_Updated %>%
 
 train <- train[, c(-1, -2, -18, -19)]
 
+le <- train$Life_expectancy
 
 #check to make sure dataframe is formatted correctly
 #View(life_expectancy_train)
@@ -49,34 +50,12 @@ library(leaps)
 ##########################
 # Best Subset Selection #
 #########################
-##The whole dataset 
-df = Life_Expectancy_Data_Updated[, c(-1, -2, -3, -19, -20)]
-regfit = regsubsets(Life_expectancy~.,data=df,nbest=1,nvmax=15)
-regfit.sum = summary(regfit)
-
-n = dim(df)[1]
-p = rowSums(regfit.sum$which)
-adjr2 = regfit.sum$adjr2
-cp = regfit.sum$cp
-rss = regfit.sum$rss
-AIC = n*log(rss/n) + 2*(p)
-BIC = n*log(rss/n) + (p)*log(n)
-
-cbind(p,rss,adjr2,cp,AIC,BIC)
-
-which.min(BIC) #M10
-which.min(AIC) #M10
-which.min(cp) #M10
-which.max(adjr2) #M11
-#Three out of the four selected M10
-coef(regfit, which.min(AIC))
-
 
 ## On the training set
 regfit = regsubsets(Life_expectancy~.,data=train,nbest=1,nvmax=15)
 regfit.sum = summary(regfit)
 
-n = dim(df)[1]
+n = dim(train)[1]
 p = rowSums(regfit.sum$which)
 adjr2 = regfit.sum$adjr2
 cp = regfit.sum$cp
@@ -86,12 +65,23 @@ BIC = n*log(rss/n) + (p)*log(n)
 
 cbind(p,rss,adjr2,cp,AIC,BIC)
 
-which.min(BIC) #M10
-which.min(AIC) #M12
-which.min(cp) #M8
-which.max(adjr2) #M10
-#Two out of the four selected M10
+which.min(BIC) 
+which.min(AIC) 
+which.min(cp)
+which.max(adjr2) 
+
 coef(regfit, which.min(BIC))
+
+model_train = lm(Life_expectancy~Under_five_deaths + Adult_mortality + 
+                   Alcohol_consumption + GDP_per_capita, data = train)
+
+predicted_values = predict(model_train,test)
+MSE_test = mean((test$Life_expectancy - predicted_values)^2)
+# 2.122
+MSE_test
+
+
+
 
 #############################################
 # Combining CV with 'best' subset selection #
@@ -119,15 +109,20 @@ model_train = lm(Life_expectancy~Infant_deaths + Under_five_deaths + Adult_morta
 
 predicted_values = predict(model_train,test)
 MSE_test = mean((test$Life_expectancy - predicted_values)^2)
+# 2.103
 MSE_test
 
-#The whole dataset
-fit = lm(Life_expectancy~Infant_deaths + Under_five_deaths + Adult_mortality + 
-           Alcohol_consumption + Hepatitis_B + BMI + Diphtheria + Incidents_HIV + 
-           GDP_per_capita + Population_mln + Thinness_ten_nineteen_years + 
-           Schooling, data = df)
-summary(fit)
+# Forward Selection
+regfit.fwd = regsubsets(Life_expectancy~.,data=train,nvmax=15, method="forward")
+summary(regfit.fwd)
 
+## Smallest to biggest
+test[order(test$Life_expectancy),]
+order(predicted_values)
+
+## Biggest to smallest
+test[order(test$Life_expectancy, decreasing = TRUE),]
+order(predicted_values, decreasing = TRUE)
 
 
 ## For all variables
@@ -137,15 +132,36 @@ predicted_values = predict(model_train,test)
 MSE_test = mean((test$Life_expectancy - predicted_values)^2)
 MSE_test
 
-## Using the variable from BIC
-model_train = lm(Life_expectancy~Infant_deaths + Under_five_deaths + Adult_mortality + 
-                   Alcohol_consumption + Hepatitis_B + BMI + Diphtheria + Incidents_HIV + 
-                   GDP_per_capita + Thinness_ten_nineteen_years, data = train)
 
-predicted_values = predict(model_train,test)
-MSE_test = mean((test$Life_expectancy - predicted_values)^2)
-MSE_test
+library(ggplot2)
+library(reshape2)
+
+test<-Life_Expectancy_Data_Updated %>%
+  filter(Year==2015) %>%
+  select(-Year)
+
+data <- data.frame(test[c(44, 57, 142, 22, 65),], predicted = predicted_values[c(44, 57, 142, 22, 65)])
+df_melt <- melt(data[, c("Country", "Life_expectancy", "predicted")], id.vars = "Country")
+
+# Create a side-by-side bar graph
+ggplot(df_melt, aes(x = Country, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Country", y = "Life Expectancy", fill = NULL)
 
 
+predict <- data.frame(test[c(148, 107, 28, 9, 86),], predicted = predicted_values[c(148, 107, 28, 9, 86)])
+predict_melt <- melt(predict[, c("Country", "Life_expectancy", "predicted")], id.vars = "Country")
+
+# Create a side-by-side bar graph
+ggplot(predict_melt, aes(x = Country, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Country", y = "Life Expectancy", fill = NULL)
 
 
+test <- data.frame(test[c(86, 107, 2, 133, 136),], predicted = predicted_values[c(86, 107, 2, 133, 136)])
+test_melt <- melt(test[, c("Country", "Life_expectancy", "predicted")], id.vars = "Country")
+
+# Create a side-by-side bar graph
+ggplot(test_melt, aes(x = Country, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Country", y = "Life Expectancy", fill = NULL)
