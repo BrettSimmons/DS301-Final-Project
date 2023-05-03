@@ -242,10 +242,12 @@ set.seed(23)
 
 #life = life_expectancy_train but without GDP_per_capita
 #removed GDP_per_capita because it has too much correlation with above_or_below_GDP
-life = life_expectancy_train[-13]
+life = life_expectancy_train[c(-1,-2,-13)]
 
 #ensured that GDP_per_capita is a factor
 life$above_or_below_GDP = as.factor(life$above_or_below_GDP)
+life$Economy_status_Developed = as.factor(life$Economy_status_Developed)
+str(life)
 
 tree.GDP = tree(above_or_below_GDP~.,data=life)
 
@@ -255,14 +257,6 @@ tree.GDP
 
 plot(tree.GDP)
 text(tree.GDP,pretty=0)
-
-
-test =  life_expectancy_train[-train,]
-tree.pred = predict(tree.GDP, newdata=test)
-
-Y.test = GDP[-train,"GDP_per_capita"]
-
-mean((tree.pred - Y.test)^2)
 
 #ensemble classifier---------------------------------------------------------#
 
