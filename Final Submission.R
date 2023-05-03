@@ -160,6 +160,47 @@ coef(final.lasso)
 
 ### Lasso a slightly smaller test MSE than Ridge, 2.1378 vs 2.1429 ###
 
+###########################################
+## Best Subset Selection - Madeline Wang ##
+###########################################
+
+set.seed(23)
+
+train <- life_expectancy_train[, c(-1, -2, -18)]
+
+le <- train$Life_expectancy
+
+test <- life_expectancy_test[, c(-1, -2, -18)]
+
+## Best Subset Selection on training set
+
+regfit = regsubsets(Life_expectancy~.,data=train,nbest=1,nvmax=15)
+regfit.sum = summary(regfit)
+
+n = dim(train)[1]
+p = rowSums(regfit.sum$which)
+adjr2 = regfit.sum$adjr2
+cp = regfit.sum$cp
+rss = regfit.sum$rss
+AIC = n*log(rss/n) + 2*(p)
+BIC = n*log(rss/n) + (p)*log(n)
+
+cbind(p,rss,adjr2,cp,AIC,BIC)
+
+which.min(BIC) 
+which.min(AIC) 
+which.min(cp)
+which.max(adjr2) 
+
+coef(regfit, which.min(BIC))
+
+model_train = lm(Life_expectancy~Under_five_deaths + Adult_mortality + 
+                   Alcohol_consumption + GDP_per_capita, data = train)
+
+predicted_values = predict(model_train,test)
+MSE_test = mean((test$Life_expectancy - predicted_values)^2)
+# 2.122
+MSE_test
 
 
 
