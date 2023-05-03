@@ -9,6 +9,8 @@ library(glmnet)
 library(car)
 library(class)
 library(caret)
+library(MASS)
+library(tree)
 
 ###################################################
 ## Data cleaning and preparation - Abbie Pigatto ##
@@ -203,6 +205,73 @@ predicted_values = predict(model_train,test)
 MSE_test = mean((test$Life_expectancy - predicted_values)^2)
 # 2.122
 MSE_test
+
+
+##########################################################
+## Decision Tree Classification - Amanda Bonczkowski    ##
+##########################################################
+
+#------------------------------------------------------------------------------#
+#Analyzing Predictor Distributions - histogram and plot
+
+#training
+plot(life_expectancy_train$GDP_per_capita)
+abline(h = mean_GDP, col = "blue")
+
+hist(life_expectancy_train$GDP_per_capita)
+abline(v = mean_GDP, col = "blue")
+
+#another visualization
+plot(life_expectancy_train$Schooling,life_expectancy_train$GDP_per_capita, col = ifelse(life_expectancy_train$GDP_per_capita>=mean_GDP,'Darkgreen','orange'))
+
+
+#making visualization plots based on our hypothesis
+plot(life_expectancy_train$Adult_mortality,life_expectancy_train$Under_five_deaths, col = ifelse(life_expectancy_train$GDP_per_capita>=mean_GDP,'Darkgreen','Blue'))
+
+plot(life_expectancy_train$above_or_below_GDP, col = "white")
+plot(life_expectancy_train$Infant_deaths, col = ifelse(life_expectancy_train$GDP_per_capita>=mean_GDP,'Darkgreen','Blue'))
+plot(life_expectancy_train$GDP_per_capita, col = ifelse(life_expectancy_train$GDP_per_capita>=mean_GDP,'Darkgreen','Blue'))
+plot(life_expectancy_train$Schooling, col = ifelse(life_expectancy_train$GDP_per_capita>=mean_GDP,'Darkgreen','Blue')) 
+
+plot(life_expectancy_train$GDP_per_capita,life_expectancy_train$Schooling ,col = ifelse(life_expectancy_train$Economy_status_Developed==1,'Darkgreen','Blue'))
+
+
+#CREATING DECISION TREE CLASSIFIER --------------------------------------------#
+
+set.seed(23)
+
+#life = life_expectancy_train but without GDP_per_capita
+#removed GDP_per_capita because it has too much correlation with above_or_below_GDP
+life = life_expectancy_train[-13]
+
+#ensured that GDP_per_capita is a factor
+life$above_or_below_GDP = as.factor(life$above_or_below_GDP)
+
+tree.GDP = tree(above_or_below_GDP~.,data=life)
+
+summary(tree.GDP)
+
+tree.GDP
+
+plot(tree.GDP)
+text(tree.GDP,pretty=0)
+
+
+test =  life_expectancy_train[-train,]
+tree.pred = predict(tree.GDP, newdata=test)
+
+Y.test = GDP[-train,"GDP_per_capita"]
+
+mean((tree.pred - Y.test)^2)
+
+#ensemble classifier---------------------------------------------------------#
+
+tree.gini = tree(above_or_below_GDP~., split=c("gini"), data=life)
+
+summary(tree.GDP)
+summary(tree.gini)
+
+
 
 ###########################################
 ## KNN Classification - Abbie Pigatto    ##
